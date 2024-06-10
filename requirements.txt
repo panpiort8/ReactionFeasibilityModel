@@ -1,0 +1,8 @@
+dgl==1.1.2+cu118
+dgllife==0.3.2
+gin_config==0.5.0
+rdkit==2023.9.1
+rdkit_pypi==2022.9.5
+torch==2.0.1
+torch_geometric==2.5.2
+torchtyping==0.1.4
