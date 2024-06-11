@@ -6,7 +6,7 @@ import torch
 from torch import nn
 from torchtyping import TensorType
 
-from models.gnns import AttentionGNN
+from rfm.models.gnns import AttentionGNN
 
 
 @gin.configurable()

@@ -5,7 +5,7 @@ from dgl import DGLGraph
 from dgllife.utils import CanonicalBondFeaturizer, mol_to_bigraph, WeaveAtomFeaturizer
 from rdkit import Chem
 
-from featurizers.utils import ATOM_TYPES
+from rfm.featurizers.utils import ATOM_TYPES
 
 
 class ReactionFeaturizer:

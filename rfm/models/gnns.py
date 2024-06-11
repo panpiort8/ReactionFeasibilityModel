@@ -9,7 +9,7 @@ from torch import nn
 from torch_geometric.utils import to_dense_batch
 from torchtyping import TensorType
 
-from models.utils import to_indices
+from rfm.models.utils import to_indices
 
 
 class AttentionGNN(nn.Module):
