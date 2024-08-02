@@ -26,3 +26,4 @@ To prepare the training datasets, run the following notebooks under `notebooks/c
 - `extract_forward_templates.ipynb`. It extracts the forward templates from the USPTO dataset.
 - `create_negative_forward.ipynb`. It creates the negative reactions by applying the forward templates to reactants from the positive dataset.
 - `create_negative_shuffle.ipynb`. It creates the negative reactions by shuffling the reactants from the positive dataset. A product from a positive dataset is assigned with a reactants coming from a similar (in terms of Tanimoto distance) reaction.
+- `merge_files.ipynb`. It merges the positive and negative datasets into a single one.
