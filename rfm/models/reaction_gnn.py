@@ -1,12 +1,12 @@
+from pathlib import Path
 from typing import Literal
 
 import dgl
 import gin
 import torch
+from models.gnns import AttentionGNN
 from torch import nn
 from torchtyping import TensorType
-
-from rfm.models.gnns import AttentionGNN
 
 
 @gin.configurable()
@@ -22,8 +22,8 @@ class ReactionGNN(nn.Module):
         concat_type: Literal["simple", "fancy"] = "simple",
         mlp_dropout: float = 0.4,
         attention_dropout: float = 0.1,
-        gnn_type: str = 'mpnn',
-        checkpoint_path: str | None = None
+        gnn_type: str = "mpnn",
+        checkpoint_path: Path | str | None = None,
     ):
         super().__init__()
         assert concat_type in ["simple", "fancy"]
@@ -36,7 +36,7 @@ class ReactionGNN(nn.Module):
             node_in_dim=node_in_dim,
             use_attention=use_attention,
             attention_dropout=attention_dropout,
-            gnn_type=gnn_type
+            gnn_type=gnn_type,
         )
         self.product_gnn = AttentionGNN(
             hidden_dim=hidden_dim,
@@ -46,7 +46,7 @@ class ReactionGNN(nn.Module):
             node_in_dim=node_in_dim,
             use_attention=use_attention,
             attention_dropout=attention_dropout,
-            gnn_type=gnn_type
+            gnn_type=gnn_type,
         )
         self.concat_type = concat_type
         mlp_size = hidden_dim * 2 if concat_type == "simple" else hidden_dim * 4
@@ -61,9 +61,9 @@ class ReactionGNN(nn.Module):
         )
 
         if checkpoint_path is not None:
-            state_dict = torch.load(checkpoint_path, map_location='cpu')
-            if 'model' in state_dict.keys():
-                state_dict = state_dict['model']
+            state_dict = torch.load(checkpoint_path, map_location="cpu")
+            if "model" in state_dict.keys():
+                state_dict = state_dict["model"]
             self.load_state_dict(state_dict)
 
     def concat(
@@ -89,8 +89,3 @@ class ReactionGNN(nn.Module):
         embeddings = self.concat(reactants_embeddings, products_embeddings)
         feasibility = self.mlp(embeddings).squeeze(-1)
         return feasibility
-
-
-
-
-

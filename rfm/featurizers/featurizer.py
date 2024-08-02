@@ -2,10 +2,9 @@ from typing import List, Tuple
 
 import dgl
 from dgl import DGLGraph
-from dgllife.utils import CanonicalBondFeaturizer, mol_to_bigraph, WeaveAtomFeaturizer
+from dgllife.utils import CanonicalBondFeaturizer, WeaveAtomFeaturizer, mol_to_bigraph
+from featurizers.utils import ATOM_TYPES
 from rdkit import Chem
-
-from rfm.featurizers.utils import ATOM_TYPES
 
 
 class ReactionFeaturizer:
@@ -24,19 +23,25 @@ class ReactionFeaturizer:
             edge_featurizer=self.edge_featurizer,
         )
 
-    def featurize_reaction_single(self, reactants: List[str], product: str) -> Tuple[DGLGraph, DGLGraph]:
+    def featurize_reaction_single(
+        self, reactants: List[str], product: str
+    ) -> Tuple[DGLGraph, DGLGraph]:
         reactants_graphs = dgl.merge([self.featurize_smiles_single(r) for r in reactants])
         product_graph = self.featurize_smiles_single(product)
         return reactants_graphs, product_graph
 
-    def featurize_reactions_batch(self, reaction_list: List[Tuple[List[str], str]]) -> Tuple[DGLGraph, DGLGraph]:
+    def featurize_reactions_batch(
+        self, reaction_list: List[Tuple[List[str], str]]
+    ) -> Tuple[DGLGraph, DGLGraph]:
         reactions = []
         for reactants, product in reaction_list:
             reaction = self.featurize_reaction_single(reactants, product)
             reactions.append(reaction)
         return self.collate_reactions(reactions)
 
-    def collate_reactions(self, reactions: List[Tuple[DGLGraph, DGLGraph]]) -> Tuple[DGLGraph, DGLGraph]:
+    def collate_reactions(
+        self, reactions: List[Tuple[DGLGraph, DGLGraph]]
+    ) -> Tuple[DGLGraph, DGLGraph]:
         reactants, products = zip(*reactions)
         reactants_batch = dgl.batch(reactants)
         product_batch = dgl.batch(products)
