@@ -1,0 +1,37 @@
+import gin_config
+import featurizers
+import models
+import trainer
+
+include 'configs/loggers/wandb.gin'
+include 'configs/models/mpnn.gin'
+include 'configs/datasets/forward_with_shuffle.gin'
+include 'configs/metrics/essential.gin'
+
+user_root_dir = 'experiments'
+run_dir = @run_dir/get_str()
+run_dir/get_str.format = '{}/{}'
+run_dir/get_str.values = [%user_root_dir, %run_name]
+
+OptimizerBase.cls_name = 'Adam'
+OptimizerBase.lr = 1e-5
+
+train_metrics = %metrics
+valid_metrics = %metrics
+
+ReactionTrainer.run_dir = %run_dir
+ReactionTrainer.train_dataset = %train_dataset
+ReactionTrainer.valid_dataset = %valid_dataset
+ReactionTrainer.train_batch_size = 64
+ReactionTrainer.valid_batch_size = 128
+ReactionTrainer.valid_metrics = %valid_metrics
+ReactionTrainer.train_metrics = %valid_metrics
+ReactionTrainer.model = %model
+ReactionTrainer.optimizer = @OptimizerBase()
+ReactionTrainer.n_epochs = 100
+ReactionTrainer.logger = %logger
+ReactionTrainer.device = 'auto'
+ReactionTrainer.checkpoint_best = True
+ReactionTrainer.best_metric = 'auroc'
+ReactionTrainer.metric_direction = 'max'
+ReactionTrainer.valid_every_n_epochs = 5

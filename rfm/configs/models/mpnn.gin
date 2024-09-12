@@ -1,0 +1,11 @@
+ReactionGNN.edge_in_dim = 13
+ReactionGNN.node_in_dim = 80
+
+ReactionGNN.hidden_dim = 256
+ReactionGNN.num_layers = 4
+ReactionGNN.num_attention_heads = 4
+ReactionGNN.use_attention = True
+ReactionGNN.concat_type = 'simple'
+ReactionGNN.gnn_type = 'mpnn'
+
+model = @ReactionGNN()

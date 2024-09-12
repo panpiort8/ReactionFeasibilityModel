@@ -1,0 +1,12 @@
+task = 'binary'
+tm.AUROC.task = %task
+tm.AveragePrecision.task = %task
+tm.Accuracy.task = %task
+tm.Precision.task = %task
+tm.Recall.task = %task
+tm.F1Score.task = %task
+
+metrics = {
+    'auroc': @tm.AUROC(),
+    'auprc': @tm.AveragePrecision()
+}

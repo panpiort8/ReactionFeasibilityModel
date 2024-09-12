@@ -1,0 +1,7 @@
+ReactionDataset.preprocessed_dir='preprocessed_graphs_local/all_with_negative_template'
+
+train/ReactionDataset.split_path='data/forward_with_shuffle/train.csv'
+valid/ReactionDataset.split_path='data/forward_with_shuffle/valid.csv'
+
+train_dataset = @train/ReactionDataset()
+valid_dataset = @valid/ReactionDataset()

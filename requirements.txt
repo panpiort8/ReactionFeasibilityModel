@@ -6,3 +6,4 @@ rdkit_pypi==2022.9.5
 torch==2.0.1
 torch_geometric==2.5.2
 torchtyping==0.1.4
+gin-config==0.5.0

@@ -1,15 +1,14 @@
 import math
-from abc import abstractmethod, ABC
-from typing import Any, Type, Dict
+from abc import ABC, abstractmethod
+from typing import Any, Dict, Type
 
 import dgl
 import torch
-from dgllife.model import MPNNGNN, GAT
+from dgllife.model import GAT, MPNNGNN
+from models.utils import to_indices
 from torch import nn
 from torch_geometric.utils import to_dense_batch
 from torchtyping import TensorType
-
-from rfm.models.utils import to_indices
 
 
 class AttentionGNN(nn.Module):
@@ -22,7 +21,7 @@ class AttentionGNN(nn.Module):
         node_in_dim: int,
         use_attention: bool,
         attention_dropout: float,
-        gnn_type: str
+        gnn_type: str,
     ):
         super().__init__()
         self.hidden_dim = hidden_dim
@@ -32,7 +31,7 @@ class AttentionGNN(nn.Module):
         self.node_in_dim = node_in_dim
         self.use_attention = use_attention
         self.gnn_type = gnn_type
-        if self.gnn_type == 'mpnn':
+        if self.gnn_type == "mpnn":
             self.gnn = MPNNGNN(
                 node_in_feats=node_in_dim,
                 edge_in_feats=edge_in_dim,
@@ -40,21 +39,18 @@ class AttentionGNN(nn.Module):
                 edge_hidden_feats=hidden_dim,
                 num_step_message_passing=num_layers,
             )
-        elif self.gnn_type == 'gat':
+        elif self.gnn_type == "gat":
             self.gnn = GAT(
                 in_feats=node_in_dim,
                 hidden_feats=[hidden_dim // 4] * num_layers,
             )
-        elif 'our' in self.gnn_type:
-            gnn_name = self.gnn_type.split('_')[1]
+        elif "our" in self.gnn_type:
+            gnn_name = self.gnn_type.split("_")[1]
             self.gnn = MPNNModel(
                 node_features_size=node_in_dim,
                 edge_features_size=edge_in_dim,
                 hidden_size=hidden_dim,
-                mpnn_layer_cls={
-                    'gine': GINELayer,
-                    'gat': GATLayer
-                }[gnn_name],
+                mpnn_layer_cls={"gine": GINELayer, "gat": GATLayer}[gnn_name],
                 mpnn_layer_kwargs={},
                 n_layers=num_layers,
                 random_walk_size=0,
@@ -92,6 +88,7 @@ class AttentionGNN(nn.Module):
         x = torch.sum(x * gating_scores.unsqueeze(-1), dim=1)
         return x
 
+
 class MPNNLayerBase(ABC, nn.Module):
     def _init(self, hidden_size: int):
         super().__init__()
@@ -99,23 +96,23 @@ class MPNNLayerBase(ABC, nn.Module):
 
     @abstractmethod
     def forward(
-            self, node_embeddings: torch.Tensor, edge_embeddings: torch.Tensor, graph: dgl.DGLGraph
+        self, node_embeddings: torch.Tensor, edge_embeddings: torch.Tensor, graph: dgl.DGLGraph
     ) -> torch.Tensor:
         ...
 
 
 class MPNNModel(nn.Module):
     def __init__(
-            self,
-            node_features_size: int,
-            edge_features_size: int,
-            hidden_size: int,
-            mpnn_layer_cls: Type[MPNNLayerBase],
-            mpnn_layer_kwargs: Dict[str, Any],
-            n_layers: int,
-            normalization: bool,
-            residual: bool,
-            random_walk_size: int,
+        self,
+        node_features_size: int,
+        edge_features_size: int,
+        hidden_size: int,
+        mpnn_layer_cls: Type[MPNNLayerBase],
+        mpnn_layer_kwargs: Dict[str, Any],
+        n_layers: int,
+        normalization: bool,
+        residual: bool,
+        random_walk_size: int,
     ):
         super().__init__()
         self.random_walk_size = random_walk_size
@@ -164,7 +161,7 @@ class GINELayer(MPNNLayerBase):
         )
 
     def forward(
-            self, node_embeddings: torch.Tensor, edge_embeddings: torch.Tensor, graph: dgl.DGLGraph
+        self, node_embeddings: torch.Tensor, edge_embeddings: torch.Tensor, graph: dgl.DGLGraph
     ) -> torch.Tensor:
         start_nodes, end_nodes, edge_ids = graph.edges(order="srcdst", form="all")
         messages = self.relu(node_embeddings[end_nodes] + edge_embeddings[edge_ids])
@@ -184,7 +181,7 @@ class GATLayer(MPNNLayerBase):
         self.leaky_relu = nn.LeakyReLU()
 
     def forward(
-            self, node_embeddings: torch.Tensor, edge_embeddings: torch.Tensor, graph: dgl.DGLGraph
+        self, node_embeddings: torch.Tensor, edge_embeddings: torch.Tensor, graph: dgl.DGLGraph
     ) -> torch.Tensor:
         start_nodes, end_nodes, edge_ids = graph.edges(order="srcdst", form="all")
         messages = self.linear_1(node_embeddings)
