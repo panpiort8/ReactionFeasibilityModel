@@ -1,0 +1,38 @@
+import gin_config
+import featurizers
+import models
+import trainer
+
+include 'configs/loggers/wandb.gin'
+include 'configs/models/gine.gin'
+include 'configs/datasets/forward_with_shuffle.gin'
+include 'configs/metrics/essential.gin'
+
+user_root_dir = 'experiments'
+run_dir = @run_dir/get_str()
+run_dir/get_str.format = '{}/{}'
+run_dir/get_str.values = [%user_root_dir, %run_name]
+
+ReactionGNNModule.model = %model
+ReactionGNNModule.lr = 1e-4
+ReactionGNNModule.train_metrics = %metrics
+ReactionGNNModule.valid_metrics = %metrics
+
+ModelCheckpoint.monitor = 'valid/auroc'
+ModelCheckpoint.mode = 'min'
+ModelCheckpoint.save_last = True
+ModelCheckpoint.save_on_train_epoch_end = False
+ModelCheckpoint.dirpath = %run_dir
+
+pl.Trainer.logger = %logger
+pl.Trainer.callbacks = @ModelCheckpoint()
+pl.Trainer.default_root_dir = %run_dir
+pl.Trainer.max_epochs = 20
+
+train.trainer = @pl.Trainer()
+train.module = @ReactionGNNModule()
+train.train_dataset = %train_dataset
+train.valid_dataset = %valid_dataset
+
+train.batch_size = 128
+train.num_workers = 4
