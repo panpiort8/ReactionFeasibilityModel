@@ -4,7 +4,7 @@ import models
 import trainer
 
 include 'configs/loggers/wandb.gin'
-include 'configs/models/gine.gin'
+include 'configs/models/egnn_like.gin'
 include 'configs/datasets/forward_with_shuffle.gin'
 include 'configs/metrics/essential.gin'
 
