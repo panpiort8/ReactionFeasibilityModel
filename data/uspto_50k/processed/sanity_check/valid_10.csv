@@ -1,0 +1,10 @@
+reactants,product,feasible,reactants_valid,products_valid,valid
+Nc1ccc(Oc2ccnc3[nH]ccc23)c(F)c1.O=C(OC(=O)C(F)(F)F)C(F)(F)F,O=C(Nc1ccc(Oc2ccnc3[nH]ccc23)c(F)c1)C(F)(F)F,1,,,
+CC(C)(C)OC(=O)OC(=O)OC(C)(C)C.COc1ccc(C(C)CN)cc1OC1Cc2ccccc2C1,COc1ccc(C(C)CNC(=O)OC(C)(C)C)cc1OC1Cc2ccccc2C1,1,,,
+Nc1ccc([N+](=O)[O-])cc1.O=C(OC(=O)C(F)(F)F)C(F)(F)F,O=C(Nc1ccc([N+](=O)[O-])cc1)C(F)(F)F,1,,,
+CC(C)(C)OC(=O)OC(=O)OC(C)(C)C.Oc1noc2c1CNCCC2,CC(C)(C)OC(=O)N1CCCc2onc(O)c2C1,1,,,
+CC(C)(C)OC(=O)N1CCN(c2cc([N+](=O)[O-])cc(-c3ccnc(NC4CCCCC4)c3)n2)CC1.CC(C)(C)OC(=O)OC(=O)OC(C)(C)C,CC(C)(C)OC(=O)N1CCN(c2cc([N+](=O)[O-])cc(-c3ccnc(N(C(=O)OC(C)(C)C)C4CCCCC4)c3)n2)CC1,1,,,
+CC(C)(C)OC(=O)OC(=O)OC(C)(C)C.NCC(c1ccccc1)c1ccccc1,CC(C)(C)OC(=O)NCC(c1ccccc1)c1ccccc1,1,,,
+CC(=O)c1ccc2c(c1)CCCN2.CC(C)(C)OC(=O)OC(=O)OC(C)(C)C,CC(=O)c1ccc2c(c1)CCCN2C(=O)OC(C)(C)C,1,,,
+C=C[C@H]1CNCC[C@H]1CCC(=O)c1ccnc2ccc(OC)cc12.CC(C)(C)OC(=O)OC(=O)OC(C)(C)C,C=C[C@H]1CN(C(=O)OC(C)(C)C)CC[C@H]1CCC(=O)c1ccnc2ccc(OC)cc12,0,,,
+CC(C)(C)OC(=O)OC(=O)OC(C)(C)C.O=C(O)C1CCCNC1,CC(C)(C)OC(=O)N1CCCC(C(=O)O)C1,0,,,

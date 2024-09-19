@@ -1,0 +1,8 @@
+WandbLogger.offline = False
+WandbLogger.project = 'RFM'
+WandbLogger.save_dir = %run_dir
+WandbLogger.name = %run_name
+WandbLogger.entity = "reaction_feasibility_model"
+
+logger/gin.singleton.constructor = @WandbLogger
+logger = @logger/gin.singleton()
