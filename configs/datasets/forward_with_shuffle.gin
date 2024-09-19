@@ -1,5 +1,5 @@
-train/ReactionDataset.split_path = 'data/processed/forward_with_shuffle/train.csv'
-valid/ReactionDataset.split_path = 'data/processed/forward_with_shuffle/valid.csv'
+train/ReactionDataset.split_path = 'data/uspto_50k/processed/forward_with_shuffle/train.csv'
+valid/ReactionDataset.split_path = 'data/uspto_50k/processed/forward_with_shuffle/valid.csv'
 train/ReactionDataset.preprocessed_dir = "processed_graphs/forward_with_shuffle/train"
 valid/ReactionDataset.preprocessed_dir = "processed_graphs/forward_with_shuffle/valid"
 

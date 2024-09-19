@@ -31,8 +31,8 @@ class ReactionGNNModule(pl.LightningModule):
         loss = self.loss_fn(logits, labels)
 
         for metric in self.train_metrics.values():
-            metric(logits, labels.long())
-        self.log("train/loss", loss, on_step=True, on_epoch=True)
+            metric.update(logits, labels.long())
+        self.log("train/loss", loss, on_step=True, on_epoch=False)
         return loss
 
     def on_train_epoch_end(self) -> None:
@@ -45,7 +45,7 @@ class ReactionGNNModule(pl.LightningModule):
         loss = self.loss_fn(logits, labels)
 
         for metric in self.valid_metrics.values():
-            metric(logits, labels.long())
+            metric.update(logits, labels.long())
 
         return loss
 

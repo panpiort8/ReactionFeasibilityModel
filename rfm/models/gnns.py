@@ -4,6 +4,7 @@ from typing import Any, Dict, Type
 
 import dgl
 import torch
+from dgl import batch
 from dgllife.model import GAT, MPNNGNN
 from models.utils import to_indices
 from torch import nn
@@ -43,6 +44,8 @@ class AttentionGNN(nn.Module):
             self.gnn = GAT(
                 in_feats=node_in_dim,
                 hidden_feats=[hidden_dim // 4] * num_layers,
+                num_heads=[4] * num_layers,
+                agg_modes=["flatten"] * num_layers,
             )
         elif "our" in self.gnn_type:
             gnn_name = self.gnn_type.split("_")[1]
@@ -50,7 +53,9 @@ class AttentionGNN(nn.Module):
                 node_features_size=node_in_dim,
                 edge_features_size=edge_in_dim,
                 hidden_size=hidden_dim,
-                mpnn_layer_cls={"gine": GINELayer, "gat": GATLayer}[gnn_name],
+                mpnn_layer_cls={"gine": GINELayer, "gat": GATLayer, "egnn-like": EGNNLikeLayer}[
+                    gnn_name
+                ],
                 mpnn_layer_kwargs={},
                 n_layers=num_layers,
                 random_walk_size=0,
@@ -76,7 +81,10 @@ class AttentionGNN(nn.Module):
         super().to(device)
 
     def forward(self, batch: dgl.DGLGraph) -> TensorType[float]:
-        x = self.gnn(batch, batch.ndata["h"], batch.edata["e"])  # (total_num_nodes, hidden_dim
+        if self.gnn_type == "gat":
+            x = self.gnn(batch, batch.ndata["h"])  # (total_num_nodes, hidden_dim)
+        else:
+            x = self.gnn(batch, batch.ndata["h"], batch.edata["e"])  # (total_num_nodes, hidden_dim)
         graph_indices = to_indices(batch.batch_num_nodes())
         x, mask = to_dense_batch(x=x, batch=graph_indices)
         if self.use_attention:
@@ -148,6 +156,49 @@ class MPNNModel(nn.Module):
         return node_embeddings
 
 
+class EGNNLikeLayer(MPNNLayerBase):
+    def __init__(self, hidden_size: int):
+        super().__init__()
+        self.hidden_size = hidden_size
+        self.message_mlp = nn.Sequential(
+            nn.Linear(3 * hidden_size, hidden_size),
+            nn.GELU(),
+            nn.Linear(hidden_size, hidden_size),
+        )
+
+        self.aggregation_mlp = nn.Sequential(
+            nn.Linear(2 * hidden_size, hidden_size),
+            nn.GELU(),
+            nn.Linear(hidden_size, hidden_size),
+        )
+
+    def forward(
+        self, node_embeddings: torch.Tensor, edge_embeddings: torch.Tensor, graph: dgl.DGLGraph
+    ) -> torch.Tensor:
+        start_nodes, end_nodes = graph.edges()
+
+        messages = self.message_mlp(
+            torch.cat(
+                [
+                    node_embeddings[start_nodes],
+                    node_embeddings[end_nodes],
+                    edge_embeddings,
+                ],
+                dim=-1,
+            )
+        )
+
+        messages_aggregated = torch.zeros_like(node_embeddings)
+        messages_aggregated = torch.index_add(
+            input=messages_aggregated, index=start_nodes, dim=0, source=messages
+        )
+
+        node_embeddings = self.aggregation_mlp(
+            torch.cat([node_embeddings, messages_aggregated], dim=-1)
+        )
+        return node_embeddings
+
+
 class GINELayer(MPNNLayerBase):
     def __init__(self, hidden_size: int, eps: float = 0.0):
         super().__init__()
@@ -165,9 +216,11 @@ class GINELayer(MPNNLayerBase):
     ) -> torch.Tensor:
         start_nodes, end_nodes, edge_ids = graph.edges(order="srcdst", form="all")
         messages = self.relu(node_embeddings[end_nodes] + edge_embeddings[edge_ids])
-        message_dense, _ = to_dense_batch(messages, start_nodes.long(), fill_value=0.0)
-        aggregated_message = message_dense.sum(dim=1)
-        node_embeddings = (1 + self.eps) * node_embeddings + aggregated_message
+        messages_aggregated = torch.zeros_like(node_embeddings)
+        messages_aggregated = torch.index_add(
+            input=messages_aggregated, index=start_nodes, dim=0, source=messages
+        )
+        node_embeddings = (1 + self.eps) * node_embeddings + messages_aggregated
         node_embeddings = self.mlp(node_embeddings)
         return node_embeddings
 

@@ -18,8 +18,8 @@ ReactionGNNModule.lr = 1e-4
 ReactionGNNModule.train_metrics = %metrics
 ReactionGNNModule.valid_metrics = %metrics
 
-ModelCheckpoint.monitor = 'valid/auroc'
-ModelCheckpoint.mode = 'min'
+ModelCheckpoint.monitor = 'valid/auprc'
+ModelCheckpoint.mode = 'max'
 ModelCheckpoint.save_last = True
 ModelCheckpoint.save_on_train_epoch_end = False
 ModelCheckpoint.dirpath = %run_dir

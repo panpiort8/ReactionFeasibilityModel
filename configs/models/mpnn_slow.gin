@@ -1,3 +1,3 @@
 include "configs/models/shared.gin"
 
-ReactionGNN.gnn_type = 'our_gine'
+ReactionGNN.gnn_type = 'mpnn'
