@@ -1,0 +1,8 @@
+train/ReactionDataset.split_path='data/uspto_50k/processed/sanity_check/valid_10.csv'
+valid/ReactionDataset.split_path='data/uspto_50k/processed/sanity_check/valid_10.csv'
+
+train/ReactionDataset.preprocessed_dir = "processed_graphs/sanity_check/train"
+valid/ReactionDataset.preprocessed_dir = "processed_graphs/sanity_check/valid"
+
+train_dataset = @train/ReactionDataset()
+valid_dataset = @valid/ReactionDataset()
