@@ -3,7 +3,7 @@ from typing import List, Tuple
 import dgl
 from dgl import DGLGraph
 from dgllife.utils import CanonicalBondFeaturizer, WeaveAtomFeaturizer, mol_to_bigraph
-from featurizers.utils import ATOM_TYPES
+from featurizers.utils import ATOM_TYPES, disjoint_union_plain
 from rdkit import Chem
 
 
@@ -26,7 +26,8 @@ class ReactionFeaturizer:
     def featurize_reaction_single(
         self, reactants: List[str], product: str
     ) -> Tuple[DGLGraph, DGLGraph]:
-        reactants_graphs = dgl.merge([self.featurize_smiles_single(r) for r in reactants])
+        reactant_graphs_list = [self.featurize_smiles_single(r) for r in reactants]
+        reactants_graphs = disjoint_union_plain(reactant_graphs_list)
         product_graph = self.featurize_smiles_single(product)
         return reactants_graphs, product_graph
 

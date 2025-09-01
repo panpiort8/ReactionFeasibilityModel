@@ -38,8 +38,3 @@ python -m scripts.train --cfg configs/rfm_train.gin
 ```
 
 If you want to use other dataset, you should create a `configs/datasets/<your_dataset>.gin` file pointing to a `*.csv` file with `reactants` `product` and `feasible` columns. Then you need to replace "include 'configs/datasets/forward_with_shuffle.gin'" with "include 'configs/datasets/<your_dataset>.gin'" in the `configs/rfm_train.gin`.
-
-## Checkpoints
-Checkpoints can be downloaded from [here](https://ujchmura-my.sharepoint.com/:f:/g/personal/piotr_gainski_doctoral_uj_edu_pl/EhHNt1xE009Eh6YI6z8b9KUBT6-2C-lsOTX5I0EWLk4lnw?e=9cPzl5) and should be placed in the `checkpoints` directory.
-
-See `notebooks/example.ipynb`.

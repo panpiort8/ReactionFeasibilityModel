@@ -6,7 +6,9 @@ import dgl
 import gin
 import pandas as pd
 import torch
+from dgl.graph_index import disjoint_union
 from featurizers import ReactionFeaturizer
+from featurizers.utils import disjoint_union_plain
 from torch import Tensor
 from torch.utils.data import Dataset
 from torchtyping import TensorType
@@ -91,7 +93,8 @@ class ReactionDataset(Dataset):
         reactant_graphs_list, product_graph_list, labels_list = [], [], []
 
         for reactant_graphs, product_graph, label in items:
-            reactant_graphs_list.append(dgl.merge(reactant_graphs))
+            reactants_graphs = disjoint_union_plain(reactant_graphs)
+            reactant_graphs_list.append(reactants_graphs)
             product_graph_list.append(product_graph)
             labels_list.append(label)
 
